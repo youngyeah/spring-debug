@@ -216,7 +216,7 @@ public interface ListableBeanFactory extends BeanFactory {
 
 	/**
 	 * Return the names of beans matching the given type (including subclasses),
-	 * judging from either bean definitions or the value of {@code getObjectType}
+	 * judging from either bean definitions or the value of {@code  }
 	 * in the case of FactoryBeans.
 	 * <p><b>NOTE: This method introspects top-level beans only.</b> It does <i>not</i>
 	 * check nested beans which might match the specified type as well.

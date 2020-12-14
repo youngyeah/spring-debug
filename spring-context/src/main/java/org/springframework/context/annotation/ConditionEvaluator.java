@@ -78,6 +78,7 @@ class ConditionEvaluator {
 	 * @return if the item should be skipped
 	 */
 	public boolean shouldSkip(@Nullable AnnotatedTypeMetadata metadata, @Nullable ConfigurationPhase phase) {
+		// 是否包含@Conditional注解（springboot扩展了这个注解，ConditionalOnClass）
 		if (metadata == null || !metadata.isAnnotated(Conditional.class.getName())) {
 			return false;
 		}
@@ -100,6 +101,7 @@ class ConditionEvaluator {
 
 		AnnotationAwareOrderComparator.sort(conditions);
 
+		// 条件计算器：判断@Conditional注解是否符合
 		for (Condition condition : conditions) {
 			ConfigurationPhase requiredPhase = null;
 			if (condition instanceof ConfigurationCondition) {
