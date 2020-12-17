@@ -1,11 +1,14 @@
 package com.yangye.spring.debug;
 
+import com.yangye.spring.debug.importselector.MyImportSelector;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 @Configuration
+@Import(MyImportSelector.class)
 public class MainConfig {
 
 	@Bean
