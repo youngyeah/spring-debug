@@ -919,9 +919,20 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		// Trigger initialization of all non-lazy singleton beans...
 		for (String beanName : beanNames) {
+			// 合并父类BeanDefinition
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
+			// 不是抽象&&是单例&&不是懒加载
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
+				// 是否是FactoryBean
+				/**
+				 * BeanFactory：必须严格遵守spring bean的生命周期，此流程非常复杂且麻烦，如果需要一种更加便捷简单的方式创建，所以有了FactoryBean接口
+				 * FactoryBean
+				 * 区别：
+				 * 相同：都用对象工厂，用来创建对象
+				 * 不同：
+				 */
 				if (isFactoryBean(beanName)) {
+					// 获取FactoryBean，&+beanName
 					Object bean = getBean(FACTORY_BEAN_PREFIX + beanName);
 					if (bean instanceof FactoryBean) {
 						FactoryBean<?> factory = (FactoryBean<?>) bean;

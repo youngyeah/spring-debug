@@ -1,5 +1,6 @@
 package com.yangye.spring.debug;
 
+import com.yangye.spring.debug.facotrybean.MyFactoryBean;
 import com.yangye.spring.debug.importselector.MyImportSelector;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
@@ -19,5 +20,10 @@ public class MainConfig {
 	@Bean
 	public BeanDefinitionRegistryPostProcessor myBeanDefinitionRegistryPostProcessor() {
 		return new MyBeanDefinitionRegistryPostProcessor();
+	}
+
+	@Bean("user")
+	public MyFactoryBean myFactoryBean() {
+		return new MyFactoryBean();
 	}
 }
