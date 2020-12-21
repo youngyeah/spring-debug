@@ -5,11 +5,13 @@ import com.yangye.spring.debug.importselector.MyImportSelector;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 @Configuration
 @Import(MyImportSelector.class)
+@ComponentScan
 public class MainConfig {
 
 	@Bean
