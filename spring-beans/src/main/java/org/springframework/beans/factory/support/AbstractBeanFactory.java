@@ -350,7 +350,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					});
 					bean = getObjectForBeanInstance(sharedInstance, name, beanName, mbd);
 				}
-
+				// 原型模式
 				else if (mbd.isPrototype()) {
 					// It's a prototype -> create a new instance.
 					Object prototypeInstance = null;
@@ -363,7 +363,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					}
 					bean = getObjectForBeanInstance(prototypeInstance, name, beanName, mbd);
 				}
-
+				// 其他模式
 				else {
 					String scopeName = mbd.getScope();
 					if (!StringUtils.hasLength(scopeName)) {
@@ -402,6 +402,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		}
 
 		// Check if required type matches the type of the actual bean instance.
+		// 检查requiredType是否与实际bean实例的类型匹配
 		if (requiredType != null && !requiredType.isInstance(bean)) {
 			try {
 				T convertedBean = getTypeConverter().convertIfNecessary(bean, requiredType);
@@ -1638,6 +1639,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				scope = getRegisteredScope(scopeName);
 			}
 		}
+		// StandardBeanExpressionResolver处理
 		return this.beanExpressionResolver.evaluate(value, new BeanExpressionContext(this, scope));
 	}
 

@@ -10,6 +10,7 @@ repositories {
 }
 
 dependencies {
+    optional("javax.annotation:javax.annotation-api")
     compile(project(":spring-aop"))
     compile(project(":spring-beans"))
     compile(project(":spring-aspects"))

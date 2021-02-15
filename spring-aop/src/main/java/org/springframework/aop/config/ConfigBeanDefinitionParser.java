@@ -233,10 +233,12 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 				}
 			}
 
+			// 将解析出来的advisor包装成AspectComponentDefinition
 			AspectComponentDefinition aspectComponentDefinition = createAspectComponentDefinition(
 					aspectElement, aspectId, beanDefinitions, beanReferences, parserContext);
 			parserContext.pushContainingComponent(aspectComponentDefinition);
 
+			// 解析aop:point-cut
 			List<Element> pointcuts = DomUtils.getChildElementsByTagName(aspectElement, POINTCUT);
 			for (Element pointcutElement : pointcuts) {
 				parsePointcut(pointcutElement, parserContext);
@@ -320,23 +322,27 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 			this.parseState.push(new AdviceEntry(parserContext.getDelegate().getLocalName(adviceElement)));
 
 			// create the method factory bean
+			// 解析advice节点中的“method”属性，并包装为MethodLocatingFactoryBean对象
 			RootBeanDefinition methodDefinition = new RootBeanDefinition(MethodLocatingFactoryBean.class);
 			methodDefinition.getPropertyValues().add("targetBeanName", aspectName);
 			methodDefinition.getPropertyValues().add("methodName", adviceElement.getAttribute("method"));
 			methodDefinition.setSynthetic(true);
 
 			// create instance factory definition
+			// 关联aspectName，包装为SimpleBeanFactoryAwareAspectInstanceFactory
 			RootBeanDefinition aspectFactoryDef =
 					new RootBeanDefinition(SimpleBeanFactoryAwareAspectInstanceFactory.class);
 			aspectFactoryDef.getPropertyValues().add("aspectBeanName", aspectName);
 			aspectFactoryDef.setSynthetic(true);
 
 			// register the pointcut
+			// 涉及point-cut属性的解析，并结合上述的两个bean最终包装为AbstractAspectJAdvice对象
 			AbstractBeanDefinition adviceDef = createAdviceDefinition(
 					adviceElement, parserContext, aspectName, order, methodDefinition, aspectFactoryDef,
 					beanDefinitions, beanReferences);
 
 			// configure the advisor
+			// 最终包装为AspectJPointcutAdvisor对象
 			RootBeanDefinition advisorDefinition = new RootBeanDefinition(AspectJPointcutAdvisor.class);
 			advisorDefinition.setSource(parserContext.extractSource(adviceElement));
 			advisorDefinition.getConstructorArgumentValues().addGenericArgumentValue(adviceDef);
@@ -441,6 +447,7 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 
 		try {
 			this.parseState.push(new PointcutEntry(id));
+			// 创建point-cut的BeanDefinition：AspectJExpressionPointcut
 			pointcutDefinition = createPointcutDefinition(expression);
 			pointcutDefinition.setSource(parserContext.extractSource(pointcutElement));
 

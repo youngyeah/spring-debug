@@ -284,6 +284,8 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	@Override
 	public Object postProcessAfterInitialization(@Nullable Object bean, String beanName) {
 		if (bean != null) {
+			// 获取当前bean的key，如果beanName不为空，则以beanName为key，如果是FactoryBean，则加&
+			// 否则以beanClass为key
 			Object cacheKey = getCacheKey(bean.getClass(), beanName);
 			if (this.earlyProxyReferences.remove(cacheKey) != bean) {
 				return wrapIfNecessary(bean, beanName, cacheKey);
@@ -322,18 +324,22 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	 * @return a proxy wrapping the bean, or the raw bean instance as-is
 	 */
 	protected Object wrapIfNecessary(Object bean, String beanName, Object cacheKey) {
+		// 如果在postProcessBeforeInstantiation已经处理过，直接返回
 		if (StringUtils.hasLength(beanName) && this.targetSourcedBeans.contains(beanName)) {
 			return bean;
 		}
+		// 如果已经代理过，缓存中已经存在，直接返回
 		if (Boolean.FALSE.equals(this.advisedBeans.get(cacheKey))) {
 			return bean;
 		}
+		// 如果不需要代理，则直接返回
 		if (isInfrastructureClass(bean.getClass()) || shouldSkip(bean.getClass(), beanName)) {
 			this.advisedBeans.put(cacheKey, Boolean.FALSE);
 			return bean;
 		}
 
 		// Create proxy if we have advice.
+		// 获取当前bean的Advices和AdVisors
 		Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);
 		if (specificInterceptors != DO_NOT_PROXY) {
 			this.advisedBeans.put(cacheKey, Boolean.TRUE);

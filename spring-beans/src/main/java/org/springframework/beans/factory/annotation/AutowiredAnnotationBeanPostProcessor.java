@@ -406,8 +406,10 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 
 	@Override
 	public PropertyValues postProcessProperties(PropertyValues pvs, Object bean, String beanName) {
+		// 从缓存中取出这个bean对应的依赖注入的元信息
 		InjectionMetadata metadata = findAutowiringMetadata(beanName, bean.getClass(), pvs);
 		try {
+			// 进行属性注入
 			metadata.inject(bean, beanName, pvs);
 		}
 		catch (BeanCreationException ex) {
@@ -680,6 +682,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 				}
 			}
 			if (value != null) {
+				// 通过反射赋值
 				ReflectionUtils.makeAccessible(field);
 				field.set(bean, value);
 			}

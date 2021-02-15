@@ -204,6 +204,7 @@ class BeanDefinitionValueResolver {
 			TypedStringValue typedStringValue = (TypedStringValue) value;
 			Object valueObject = evaluate(typedStringValue);
 			try {
+				// 解析目标类型
 				Class<?> resolvedTargetType = resolveTargetType(typedStringValue);
 				if (resolvedTargetType != null) {
 					return this.typeConverter.convertIfNecessary(valueObject, resolvedTargetType);

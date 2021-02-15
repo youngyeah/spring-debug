@@ -223,6 +223,11 @@ public abstract class AopUtils {
 	 */
 	public static boolean canApply(Pointcut pc, Class<?> targetClass, boolean hasIntroductions) {
 		Assert.notNull(pc, "Pointcut must not be null");
+		// 进行切点表达式的匹配最重要的就是ClassFilter和MethodMatcher这两个方法的实现
+		// MethodMatcher中有两个matches方法，一个参数是只有Method对象和targetClass
+		// 另一个参数有Method对象、targetClass对象，还有一个Method的方法参数
+		// 这两个方法的区别是：两个参数的用于静态方法的匹配，三个参数的用于运行期动态方法的匹配
+		// 首先进行ClassFilter的匹配，首先这个类要在匹配规则下
 		if (!pc.getClassFilter().matches(targetClass)) {
 			return false;
 		}
@@ -239,14 +244,23 @@ public abstract class AopUtils {
 		}
 
 		Set<Class<?>> classes = new LinkedHashSet<>();
+		// 判断当前class是否是代理对象
 		if (!Proxy.isProxyClass(targetClass)) {
 			classes.add(ClassUtils.getUserClass(targetClass));
 		}
+		// 获取targetClass所实现的接口
 		classes.addAll(ClassUtils.getAllInterfacesForClassAsSet(targetClass));
 
+		// 循环所有的class对象
 		for (Class<?> clazz : classes) {
+			// 获取所有的方法
 			Method[] methods = ReflectionUtils.getAllDeclaredMethods(clazz);
+			// 遍历所有的方法进行匹配
 			for (Method method : methods) {
+				// 只要有一个方法匹配就返回true
+				// 这里会有一个问题，因为在一个目标中可能会有多个方法存在，有的方法是满足这个切点的匹配规则的
+				// 但是也可能有一些方法是不匹配切点规则的，这里检测的是只有一个method满足切点规则就返回true了
+				// 所以在运行时进行方法拦截的时候还会有一次运行时的方法切点规则匹配
 				if (introductionAwareMethodMatcher != null ?
 						introductionAwareMethodMatcher.matches(method, targetClass, hasIntroductions) :
 						methodMatcher.matches(method, targetClass)) {
@@ -308,6 +322,7 @@ public abstract class AopUtils {
 		}
 		List<Advisor> eligibleAdvisors = new ArrayList<>();
 		for (Advisor candidate : candidateAdvisors) {
+			// 判断候选的增强器是否实现了IntroductionAdvisor
 			if (candidate instanceof IntroductionAdvisor && canApply(candidate, clazz)) {
 				eligibleAdvisors.add(candidate);
 			}
@@ -318,6 +333,7 @@ public abstract class AopUtils {
 				// already processed
 				continue;
 			}
+			// 真正判断增强器是否适合当前bean
 			if (canApply(candidate, clazz, hasIntroductions)) {
 				eligibleAdvisors.add(candidate);
 			}

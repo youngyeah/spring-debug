@@ -59,6 +59,7 @@ public class BeanFactoryAdvisorRetrievalHelper {
 
 
 	/**
+	 * 找到当前容器中存在的advisor
 	 * Find all eligible Advisor beans in the current bean factory,
 	 * ignoring FactoryBeans and excluding beans that are currently in creation.
 	 * @return the list of {@link org.springframework.aop.Advisor} beans
@@ -88,6 +89,7 @@ public class BeanFactoryAdvisorRetrievalHelper {
 				}
 				else {
 					try {
+						// 实例化Advisor并添加到集合中
 						advisors.add(this.beanFactory.getBean(name, Advisor.class));
 					}
 					catch (BeanCreationException ex) {

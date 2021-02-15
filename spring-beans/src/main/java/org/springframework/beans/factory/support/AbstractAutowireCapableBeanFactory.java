@@ -520,6 +520,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		try {
 			// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
+			// 给BPP一个机会来返回代理替代真正的实例
 			Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
 			if (bean != null) {
 				return bean;
@@ -613,7 +614,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Initialize the bean instance.
 		Object exposedObject = bean;
 		try {
+			// 属性填充
 			populateBean(beanName, mbd, instanceWrapper);
+			// bean初始化
 			exposedObject = initializeBean(beanName, exposedObject, mbd);
 		}
 		catch (Throwable ex) {
@@ -626,9 +629,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 		}
 
+		// 是否有循环依赖的情况
 		if (earlySingletonExposure) {
+			// 从缓存中获取对象
 			Object earlySingletonReference = getSingleton(beanName, false);
+			// 只有在检测到循环依赖的情况下才会不为空
 			if (earlySingletonReference != null) {
+				// 若果exposedObject没有在初始化方法中被改变，也就是没有被增强（aop）
 				if (exposedObject == bean) {
 					exposedObject = earlySingletonReference;
 				}
@@ -640,6 +647,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 							actualDependentBeans.add(dependentBean);
 						}
 					}
+					// actualDependentBeans不为空则表示当前bean创建后其依赖的bean却没有全部创建完，也就是说存在循环依赖
 					if (!actualDependentBeans.isEmpty()) {
 						throw new BeanCurrentlyInCreationException(beanName,
 								"Bean with name '" + beanName + "' has been injected into other beans [" +
@@ -1428,6 +1436,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		boolean needsDepCheck = (mbd.getDependencyCheck() != AbstractBeanDefinition.DEPENDENCY_CHECK_NONE);
 
 		PropertyDescriptor[] filteredPds = null;
+		// 如果工厂拥有InstantiationAwareBeanPostProcessor,那么处理的流程，主要是对几个注解的赋值工作，
+		// 两个关键子类：commonAnnotationBeanPostProcessor和AutowiredAnnotationBeanPostProcessor
 		if (hasInstAwareBpps) {
 			if (pvs == null) {
 				pvs = mbd.getPropertyValues();
@@ -1456,6 +1466,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		if (pvs != null) {
+			// 应用给定的属性值，解决任何在这个bean工厂运行时其他bean的引用。必须使用深拷贝，所以我们不会永久地修改这个属性
 			applyPropertyValues(beanName, mbd, bw, pvs);
 		}
 	}
@@ -1801,15 +1812,19 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}, getAccessControlContext());
 		}
 		else {
+			// 执行aware接口
 			invokeAwareMethods(beanName, bean);
 		}
 
 		Object wrappedBean = bean;
 		if (mbd == null || !mbd.isSynthetic()) {
+			// ApplicationContextAwarePostProcessor接口
+			// CommonAnnotationBeanPostProcessor --> @PostConstruct方法
 			wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
 		}
 
 		try {
+			// 执行init-method方法 --> afterPropertiesSet方法 && 用户自定义的初始化方法init-method
 			invokeInitMethods(beanName, wrappedBean, mbd);
 		}
 		catch (Throwable ex) {
@@ -1818,6 +1833,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					beanName, "Invocation of init method failed", ex);
 		}
 		if (mbd == null || !mbd.isSynthetic()) {
+			// 这里进行了aop代理：AbstractAutoProxyCreator
 			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
 		}
 
