@@ -17,14 +17,16 @@ public class Demo1 {
 //		System.out.println(factoryBean);
 
 		// 未使用lookup-method
-		Apple apple = ctx.getBean(Apple.class);
-		System.out.println(apple.getBanana());
-		Apple apple2 = ctx.getBean(Apple.class);
-		System.out.println(apple.getBanana());
+//		Apple apple = ctx.getBean(Apple.class);
+//		System.out.println(apple.getBanana());
+//		Apple apple2 = ctx.getBean(Apple.class);
+//		System.out.println(apple.getBanana());
+//
+//		// 使用lookup-method
+//		System.out.println(apple.createBanana());
+//		System.out.println(apple.createBanana());
 
-		// 使用lookup-method
-		System.out.println(apple.createBanana());
-		System.out.println(apple.createBanana());
-
+		Person bean = (Person) ctx.getBean("person2");
+		System.out.println(bean);
 	}
 }

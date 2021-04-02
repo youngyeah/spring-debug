@@ -7,11 +7,12 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 
 @Configuration
 @Import(MyImportSelector.class)
-@ComponentScan
+@ComponentScan(excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {MainConfig2.class}))
 public class MainConfig {
 
 	@Bean
@@ -26,6 +27,11 @@ public class MainConfig {
 
 	@Bean("user")
 	public MyFactoryBean myFactoryBean() {
+		return new MyFactoryBean();
+	}
+
+	@Bean
+	public MyFactoryBean test() {
 		return new MyFactoryBean();
 	}
 }
